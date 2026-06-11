@@ -1,0 +1,14 @@
+[Unit]
+Description=MDS Preview Server (Vite Preview)
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/mds/app
+ExecStart=/usr/bin/npm run serve:lan
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
