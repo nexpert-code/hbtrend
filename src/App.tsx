@@ -277,7 +277,7 @@ function App() {
                 inputMode="numeric"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                placeholder="0415"
+                placeholder="비밀번호 입력"
                 autoFocus
               />
             </label>
