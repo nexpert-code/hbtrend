@@ -33,7 +33,7 @@ type ViewMode = 'input' | 'result'
 
 const STORAGE_KEY = 'mds.records.v1'
 const AUTH_KEY = 'mds.auth.v1'
-const AUTH_PASSWORD = '0415'
+const AUTH_PASSWORD = import.meta.env.VITE_APP_PASSWORD ?? ''
 
 const SAMPLE_RECORDS: BloodRecord[] = [
   {
