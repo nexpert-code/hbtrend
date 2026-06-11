@@ -7,7 +7,6 @@
   gap: 14px;
 }
 
-.hero-card,
 .panel,
 .stat-card,
 .record-card {
@@ -15,14 +14,6 @@
   border-radius: 24px;
   background: var(--surface);
   box-shadow: var(--shadow);
-}
-
-.hero-card {
-  padding: 22px 20px;
-  background:
-    radial-gradient(circle at top right, rgba(20, 184, 166, 0.18), transparent 32%),
-    radial-gradient(circle at left bottom, rgba(59, 130, 246, 0.16), transparent 28%),
-    var(--surface);
 }
 
 .eyebrow,
@@ -35,28 +26,6 @@
   text-transform: uppercase;
 }
 
-.hero-card h1 {
-  margin: 10px 0 12px;
-  font-size: clamp(1.8rem, 8vw, 2.6rem);
-  line-height: 1.12;
-  letter-spacing: -0.04em;
-}
-
-.hero-copy {
-  margin: 0;
-  color: var(--muted-strong);
-  font-size: 1.05rem;
-  line-height: 1.7;
-}
-
-.hero-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 18px;
-}
-
-.hero-badges span,
 .chart-range {
   border-radius: 999px;
   padding: 10px 12px;
@@ -300,6 +269,30 @@
   margin-top: 8px;
 }
 
+.chart-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.chart-summary div {
+  border-radius: 14px;
+  padding: 10px;
+  background: rgba(15, 23, 42, 0.05);
+}
+
+.chart-summary span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.chart-summary strong {
+  color: var(--text-strong);
+  font-size: 1.05rem;
+}
+
 .chart-scroll {
   width: 100%;
   overflow-x: auto;
@@ -312,9 +305,21 @@
   display: block;
 }
 
-.chart line {
+.chart-grid {
   stroke: rgba(148, 163, 184, 0.8);
-  stroke-width: 2;
+  stroke-width: 1.5;
+}
+
+.chart-y-label,
+.chart-x-label,
+.chart-point-label {
+  font-size: 11px;
+  fill: var(--muted-strong);
+}
+
+.chart-point-label {
+  font-weight: 700;
+  fill: var(--text-strong);
 }
 
 .chart polyline {
@@ -344,6 +349,43 @@
 
 .search-box {
   width: min(100%, 340px);
+}
+
+.table-wrap {
+  margin-top: 14px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+
+.record-table {
+  width: 100%;
+  min-width: 860px;
+  border-collapse: collapse;
+  background: var(--surface);
+}
+
+.record-table th,
+.record-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.record-table th {
+  position: sticky;
+  top: 0;
+  background: var(--field);
+  color: var(--text-strong);
+  font-weight: 800;
+  z-index: 1;
+}
+
+.record-table td {
+  color: var(--muted-strong);
+  font-size: 0.92rem;
 }
 
 .record-list {

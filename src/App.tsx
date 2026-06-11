@@ -293,22 +293,6 @@ function App() {
 
   return (
     <main className="app-shell">
-      <header className="hero-card">
-        <div>
-          <p className="eyebrow">MDS 혈액검사 기록</p>
-          <h1>입력 화면과 결과 화면을 분리한 모바일 뷰</h1>
-          <p className="hero-copy">
-            입력은 간단하게, 결과는 크게 확인할 수 있도록 나눴습니다. 그래프는 Hb(혈색소)
-            변화만 표시합니다.
-          </p>
-        </div>
-        <div className="hero-badges">
-          <span>큰 글씨</span>
-          <span>세로 화면 우선</span>
-          <span>오프라인 저장</span>
-        </div>
-      </header>
-
       <section className="page-switch" aria-label="페이지 전환">
         <button
           type="button"
@@ -449,7 +433,7 @@ function App() {
               <div className="panel-header compact">
                 <div>
                   <p className="section-label">Hb 추세</p>
-                  <h2>혈색소 변화</h2>
+                  <h2>혈색소 변화 그래프</h2>
                 </div>
                 <span className="chart-range">전체 {sortedRecords.length}건</span>
               </div>
@@ -480,46 +464,48 @@ function App() {
               </label>
             </div>
 
-            <div className="record-list" role="list">
-              {filteredRecords.length > 0 ? (
-                filteredRecords.map((record) => (
-                  <article className="record-card" key={record.id} role="listitem">
-                    <header>
-                      <strong>{formatDate(record.date)}</strong>
-                      <span>{record.updatedAt ? formatTime(record.updatedAt) : ''}</span>
-                    </header>
-                    <div className="record-grid">
-                      <div>
-                        <span>Hb</span>
-                        <strong>{record.hb != null ? record.hb.toFixed(1) : '-'}</strong>
-                      </div>
-                      <div>
-                        <span>Reticulocyte Hb</span>
-                        <strong>{record.rhb != null ? record.rhb.toFixed(1) : '-'}</strong>
-                      </div>
-                      <div>
-                        <span>치료</span>
-                        <strong>{record.treatment || '-'}</strong>
-                      </div>
-                      <div>
-                        <span>수혈</span>
-                        <strong>{record.transfusion || '-'}</strong>
-                      </div>
-                    </div>
-                    {record.memo ? <p className="memo">{record.memo}</p> : null}
-                    <button
-                      className="button button-text"
-                      type="button"
-                      onClick={() => removeRecord(record.id)}
-                    >
-                      삭제
-                    </button>
-                  </article>
-                ))
-              ) : (
-                <p className="empty-state">표시할 기록이 없습니다. CSV를 넣거나 새 기록을 추가하세요.</p>
-              )}
-            </div>
+            {filteredRecords.length > 0 ? (
+              <div className="table-wrap" role="region" aria-label="기록 표 영역">
+                <table className="record-table">
+                  <thead>
+                    <tr>
+                      <th>날짜</th>
+                      <th>Hb</th>
+                      <th>Reticulocyte Hb</th>
+                      <th>치료</th>
+                      <th>수혈</th>
+                      <th>메모</th>
+                      <th>수정시각</th>
+                      <th>관리</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredRecords.map((record) => (
+                      <tr key={record.id}>
+                        <td>{formatDate(record.date)}</td>
+                        <td>{record.hb != null ? record.hb.toFixed(1) : '-'}</td>
+                        <td>{record.rhb != null ? record.rhb.toFixed(1) : '-'}</td>
+                        <td>{record.treatment || '-'}</td>
+                        <td>{record.transfusion || '-'}</td>
+                        <td>{record.memo || '-'}</td>
+                        <td>{record.updatedAt ? formatTime(record.updatedAt) : '-'}</td>
+                        <td>
+                          <button
+                            className="button button-text"
+                            type="button"
+                            onClick={() => removeRecord(record.id)}
+                          >
+                            삭제
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="empty-state">표시할 기록이 없습니다. CSV를 넣거나 새 기록을 추가하세요.</p>
+            )}
           </section>
         </>
       )}
@@ -693,10 +679,19 @@ function TrendChart({ records, label, unit, color, getValue }: TrendChartProps) 
 
   const minValue = Math.min(...numericValues)
   const maxValue = Math.max(...numericValues)
-  const padding = 28
-  const width = Math.max(360, padding * 2 + Math.max(records.length - 1, 1) * 72)
-  const height = 180
+  const latest = numericValues[numericValues.length - 1]
+  const previous = numericValues[numericValues.length - 2]
+  const diff = latest - previous
+  const padding = 42
+  const width = Math.max(360, padding * 2 + Math.max(records.length - 1, 1) * 76)
+  const height = 260
   const spread = maxValue - minValue || 1
+  const ySteps = 4
+  const yTicks = Array.from({ length: ySteps + 1 }, (_, index) => {
+    const value = maxValue - ((maxValue - minValue) * index) / ySteps
+    const y = padding + ((height - padding * 2) * index) / ySteps
+    return { value, y }
+  })
   const points = values
     .map((value, index) => {
       if (value == null) {
@@ -715,6 +710,24 @@ function TrendChart({ records, label, unit, color, getValue }: TrendChartProps) 
 
   return (
     <div className="chart-wrap">
+      <div className="chart-summary">
+        <div>
+          <span>최근</span>
+          <strong>{latest.toFixed(1)}</strong>
+        </div>
+        <div>
+          <span>최대</span>
+          <strong>{maxValue.toFixed(1)}</strong>
+        </div>
+        <div>
+          <span>최소</span>
+          <strong>{minValue.toFixed(1)}</strong>
+        </div>
+        <div>
+          <span>변화</span>
+          <strong>{diff >= 0 ? `+${diff.toFixed(1)}` : diff.toFixed(1)}</strong>
+        </div>
+      </div>
       <div className="chart-scroll" role="region" aria-label="그래프 가로 스크롤 영역">
         <svg
           viewBox={`0 0 ${width} ${height}`}
@@ -723,7 +736,21 @@ function TrendChart({ records, label, unit, color, getValue }: TrendChartProps) 
           aria-label={label}
           style={{ width: `${width}px`, minWidth: '100%' }}
         >
-          <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} />
+          {yTicks.map((tick) => (
+            <g key={`tick-${tick.y}`}>
+              <line
+                x1={padding}
+                y1={tick.y}
+                x2={width - padding}
+                y2={tick.y}
+                className="chart-grid"
+              />
+              <text x={padding - 10} y={tick.y + 4} textAnchor="end" className="chart-y-label">
+                {tick.value.toFixed(1)}
+              </text>
+            </g>
+          ))}
+
           <polyline points={points.join(' ')} stroke={color} fill="none" strokeWidth="6" />
           {values.map((value, index) => {
             if (value == null) {
@@ -736,7 +763,24 @@ function TrendChart({ records, label, unit, color, getValue }: TrendChartProps) 
               padding -
               ((value - minValue) * (height - padding * 2)) / spread
 
-            return <circle key={`${label}-${index}`} cx={x} cy={y} r={5} fill={color} />
+            const showLabel = values.length <= 24 || index % 3 === 0 || index === values.length - 1
+
+            return (
+              <g key={`${label}-${index}`}>
+                <circle cx={x} cy={y} r={6} fill={color} />
+                {showLabel ? (
+                  <text x={x} y={y - 12} textAnchor="middle" className="chart-point-label">
+                    {value.toFixed(1)}
+                  </text>
+                ) : null}
+                <text x={x} y={height - 10} textAnchor="middle" className="chart-x-label">
+                  {formatDate(records[index].date).slice(2, 10)}
+                </text>
+                <title>
+                  {formatDate(records[index].date)} / {value.toFixed(1)} {unit}
+                </title>
+              </g>
+            )
           })}
         </svg>
       </div>
